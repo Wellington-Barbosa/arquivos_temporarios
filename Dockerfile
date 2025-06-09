@@ -26,9 +26,5 @@ ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_21_12
 # Copia todo o código
 COPY . .
 
-# Copia o script de entrada customizado
-COPY mode/docker-entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Define o entrypoint
-ENTRYPOINT ["/entrypoint.sh"]
+# Comando final para produção
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5001", "wsgi:app"]
