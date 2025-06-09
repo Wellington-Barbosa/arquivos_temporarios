@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  flask-app:
+    build: .
+    container_name: portal-corporativo-rede
+    ports:
+      - "5001:5001" # externo:interno
+    env_file: .env
+    volumes:
+      - ./app:/app/app
+      - ./sql:/app/sql
+    restart: unless-stopped
