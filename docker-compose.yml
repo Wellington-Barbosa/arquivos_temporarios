@@ -1,0 +1,40 @@
+# docker-compose.yml
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    # NOME DIFERENTE DA PRODUÇÃO
+    container_name: ds-backend-homolog 
+    env_file:
+      # Aponta para o arquivo que acabamos de criar
+      - ./backend/.env.docker
+    ports:
+      # PORTA EXTERNA 5001 (para não bater na 5000 da prod)
+      - "5001:5000"   
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: "/api"
+        VITE_MASTER_USERNAME: "adm.wellington"
+        # AQUI ESTÁ O SEGREDO DO RODAPÉ VERMELHO:
+        VITE_APP_ENV: homolog 
+    # NOME DIFERENTE DA PRODUÇÃO
+    container_name: ds-frontend-homolog
+    ports:
+      # PORTA EXTERNA 8080 (para acessar via http://IP:8080)
+      - "8080:80"
+      # Comentei o 443 para teste inicial via HTTP, mas se precisar de SSL, descomente e use porta ex: 8443
+      # - "8443:443"     
+    volumes:
+      # Mantendo o volume de SSL caso precise ativar depois
+      - /ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
